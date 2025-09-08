@@ -1,2 +1,2 @@
 # mlops-minimal
-This is a repository to put a simple a ML model to production 
+This is a repository to put a simple ML model to production 
