@@ -1,0 +1,38 @@
+# MLflow Configuration
+mlflow:
+  tracking_uri: "http://localhost:8080"
+  experiment_name: "Iris Classification"
+  model_name: "iris_classifier"
+  model_version: "latest"
+
+# Model Parameters
+model:
+  solver: "lbfgs"
+  max_iter: 1000
+  multi_class: "auto"
+  random_state: 42
+
+# Data Configuration
+data:
+  test_size: 0.2
+  class_names:
+    - "Setosa"
+    - "Versicolor" 
+    - "Virginica"
+
+# API Configuration
+api:
+  title: "ML API"
+  host: "localhost"
+  port: 8000
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Training Configuration
+training:
+  artifact_path: "iris_model"
+  tags:
+    Training Info: "Basic LogReg model for iris dataset"

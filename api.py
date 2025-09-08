@@ -4,26 +4,33 @@ import mlflow.sklearn
 import numpy as np
 import logging
 from datetime import datetime
+from config_loader import load_config, get_config_section
+
+# Load configuration
+config = load_config()
+api_config = get_config_section(config, "api")
+mlflow_config = get_config_section(config, "mlflow")
+data_config = get_config_section(config, "data")
+logging_config = get_config_section(config, "logging")
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=getattr(logging, logging_config["level"]),
+    format=logging_config["format"]
 )
 logger = logging.getLogger(__name__)
 
-
-app = FastAPI(title="ML API")
+app = FastAPI(title=api_config["title"])
 
 
 def load_model():
     try:
         # Set MLflow tracking URI
-        mlflow.set_tracking_uri("http://localhost:8080")
+        mlflow.set_tracking_uri(mlflow_config["tracking_uri"])
         
         # Load model from registry
-        model_name = "iris_classifier"
-        model_version = "latest"  # or specify a version number
+        model_name = mlflow_config["model_name"]
+        model_version = mlflow_config["model_version"]
         model_uri = f"models:/{model_name}/{model_version}"
         
         logger.info(f"Loading model from registry: {model_uri}")
@@ -71,14 +78,13 @@ def predict(request: PredictionRequest):
             request.sepal_width,
             request.petal_length,
             request.petal_width
-
         ]])
 
         # Make prediction
         prediction = model.predict(features)[0]
 
-        # Map to class name
-        class_names = ["Setosa", "Versicolor", "Virginica"]
+        # Map to class name using config
+        class_names = data_config["class_names"]
         prediction_name = class_names[prediction]
 
         # Log the predictions
@@ -97,4 +103,4 @@ def predict(request: PredictionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host=api_config["host"], port=api_config["port"])
