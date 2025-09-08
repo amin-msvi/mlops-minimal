@@ -39,10 +39,14 @@ with mlflow.start_run():
         artifact_path="iris_model",
         signature=signature,
         input_example=X_train,
+        registered_model_name="iris_classifier"
     )
 
 
     mlflow.set_tags({"Training Info": "Basic LogReg model for iris dataset"})
+
+    print("model registered as: iris_classifier")
+    print(f"Model URI: {model_info.model_uri}")
 
 
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
