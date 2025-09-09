@@ -49,8 +49,8 @@ jobs:
     - name: Test with Docker Compose
       run: |
         mkdir -p mlruns mlartifacts
-        docker-compose up -d
-        sleep 90
+        docker compose up -d
+        sleep 160
         
         # Test MLflow
         echo "Testing MLflow..."
@@ -60,4 +60,4 @@ jobs:
         echo "Testing API..."
         curl -f http://localhost:8000/health
         
-        docker-compose down
+        docker compose down
