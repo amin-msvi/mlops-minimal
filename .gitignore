@@ -214,3 +214,4 @@ mlflow.db
 mlflow.log
 *.db-shm
 *.db-wal
+artifacts/

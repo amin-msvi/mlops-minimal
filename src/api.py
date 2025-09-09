@@ -5,6 +5,7 @@ import numpy as np
 import logging
 from datetime import datetime
 from config_loader import load_config, get_config_section
+import os
 
 # Load configuration
 config = load_config()
@@ -12,6 +13,9 @@ api_config = get_config_section(config, "api")
 mlflow_config = get_config_section(config, "mlflow")
 data_config = get_config_section(config, "data")
 logging_config = get_config_section(config, "logging")
+
+if "MLFLOW_TRACKING_URI" in os.environ:
+    mlflow_config["tracking_uri"] = os.environ["MLFLOW_TRACKING_URI"]
 
 # Setup logging
 logging.basicConfig(
