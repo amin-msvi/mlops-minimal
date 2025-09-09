@@ -32,8 +32,9 @@ jobs:
     
     - name: Test model training
       run: |
-        export MLFLOW_TRACKING_URI=file://./test_mlruns
-        python src/train.py
+        rm -rf test_mlruns
+        export MLFLOW_TRACKING_URI=file:./test_mlruns
+        timeout 60 python src/train.py
     
   docker:
     runs-on: ubuntu-latest

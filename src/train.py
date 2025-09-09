@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from config_loader import load_config, get_config_section
+import os
 
 # Load configuration
 config = load_config()
@@ -12,6 +13,11 @@ mlflow_config = get_config_section(config, "mlflow")
 model_config = get_config_section(config, "model")
 data_config = get_config_section(config, "data")
 training_config = get_config_section(config, "training")
+
+
+# Overriding MLflow URI if environment variable is set (for local development/CI)
+if "MLFLOW_TRACKING_URI" in os.environ:
+    mlflow_config["tracking_uri"] = os.environ["MLFLOW_TRACKING_URI"]
 
 # Load and split data
 X, y = load_iris(return_X_y=True)
