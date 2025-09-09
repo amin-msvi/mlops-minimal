@@ -1,4 +1,3 @@
-import joblib
 import mlflow
 from mlflow.models import infer_signature
 from sklearn.datasets import load_iris
@@ -48,7 +47,7 @@ with mlflow.start_run():
         artifact_path=training_config["artifact_path"],
         signature=signature,
         input_example=X_train,
-        registered_model_name=mlflow_config["model_name"]
+        registered_model_name=mlflow_config["model_name"],
     )
 
     # Set tags
