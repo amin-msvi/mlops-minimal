@@ -86,9 +86,9 @@ def get_monitoring_stats():
         "monitoring_files": {
             "requests": str(monitor.requests_file),
             "failures": str(monitor.failures_file),
-            "daily_stats": str(monitor.stats_file)
+            "daily_stats": str(monitor.stats_file),
         },
-        "message": "All requests and responses are automatically logged"
+        "message": "All requests and responses are automatically logged",
     }
 
 
@@ -96,14 +96,14 @@ def get_monitoring_stats():
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
     request_data = request.dict()
-    
+
     if model is None:
         error_msg = "Model not loaded"
         logger.error(f"Prediction failed - {error_msg}")
-        
+
         # Log failed request
         monitor.log_request(request_data, error=error_msg)
-        
+
         raise HTTPException(status_code=503, detail=error_msg)
 
     try:
@@ -138,18 +138,20 @@ def predict(request: PredictionRequest):
 
         # Log successful request/response - THIS IS THE KEY PART
         request_id = monitor.log_request(request_data, response_data)
-        
-        logger.info(f"Prediction successful [ID: {request_id}] - {prediction_name} (confidence: {confidence:.3f})")
+
+        logger.info(
+            f"Prediction successful [ID: {request_id}] - {prediction_name} (confidence: {confidence:.3f})"
+        )
 
         return PredictionResponse(**response_data)
 
     except Exception as e:
         error_msg = f"Prediction error: {str(e)}"
         logger.error(error_msg)
-        
+
         # Log failed request - THIS CAPTURES FAILURES
         monitor.log_request(request_data, error=error_msg)
-        
+
         raise HTTPException(status_code=500, detail=str(e))
 
 
