@@ -1,6 +1,6 @@
 services:
   mlflow:
-    image: python:3.9-slim
+    image: python:3.11-slim
     container_name: mlflow-server
     ports:
       - "8080:8080"
@@ -27,8 +27,8 @@ services:
     command: >
       bash -c "
         sleep 30 &&
-        python train.py &&
-        python api.py
+        python src/train.py &&
+        python src/api.py
       "
     environment:
       - PYTHONPATH=/app

@@ -208,6 +208,7 @@ __marimo__/
 
 
 # MLflow
+local_mlruns/
 mlruns/
 mlflow.db
 mlflow.log

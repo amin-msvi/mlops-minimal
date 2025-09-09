@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check .
+        ruff format --check .
+    
+    - name: Test config loading
+      run: python -c "from src.config_loader import load_config; print('Config OK')"
+    
+    - name: Test model training
+      run: |
+        rm -rf test_mlruns
+        export MLFLOW_TRACKING_URI=file:./test_mlruns
+        timeout 60 python src/train.py
+    
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: docker build -t ml-api .
+    
+    - name: Test with Docker Compose
+      run: |
+        mkdir -p mlruns mlartifacts
+        docker compose up -d
+        sleep 160
+        
+        # Test MLflow
+        echo "Testing MLflow..."
+        curl -f http://localhost:8080/ > /dev/null
+        
+        # Test API health
+        echo "Testing API..."
+        curl -f http://localhost:8000/health
+        
+        docker compose down
