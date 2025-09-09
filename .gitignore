@@ -215,3 +215,4 @@ mlflow.log
 *.db-shm
 *.db-wal
 artifacts/
+monitoring_logs/
