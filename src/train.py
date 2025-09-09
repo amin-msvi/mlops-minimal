@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from config_loader import load_config, get_config_section
 import os
-
+import logging
 
 class IrisModelTrainer:
     def __init__(self):
@@ -15,9 +15,10 @@ class IrisModelTrainer:
         self.model_config = get_config_section(self.config, "model")
         self.data_config = get_config_section(self.config, "data")
         self.training_config = get_config_section(self.config, "training")
-
+        self.logger = self._setup_logging()
         # Override MLflow URI if environment variable is set
         if "MLFLOW_TRACKING_URI" in os.environ:
+            self.logger.info(f"Overriding MLflow tracking URI: {os.environ['MLFLOW_TRACKING_URI']}")
             self.mlflow_config["tracking_uri"] = os.environ["MLFLOW_TRACKING_URI"]
 
         self.model = None
@@ -25,6 +26,15 @@ class IrisModelTrainer:
         self.X_test = None
         self.y_train = None
         self.y_test = None
+
+    def _setup_logging(self):
+        """Setup logging configuration."""
+        logging_config = self.config["logging"]
+        logging.basicConfig(
+            level=getattr(logging, logging_config["level"]),
+            format=logging_config["format"],
+        )
+        return logging.getLogger(__name__)
 
     def load_and_split_data(self):
         """Load iris dataset and split into train/test sets."""
@@ -37,6 +47,7 @@ class IrisModelTrainer:
         """Create and train the logistic regression model."""
         self.model = LogisticRegression(**self.model_config)
         self.model.fit(self.X_train, self.y_train)
+        self.logger.info("Model training complete.")
 
     def evaluate_model(self):
         """Evaluate the trained model and return accuracy."""
@@ -72,8 +83,8 @@ class IrisModelTrainer:
             # Set tags
             mlflow.set_tags(self.training_config["tags"])
 
-            print(f"Model registered as: {self.mlflow_config['model_name']}")
-            print(f"Model URI: {model_info.model_uri}")
+            self.logger.info(f"Model registered as: {self.mlflow_config['model_name']}")
+            self.logger.info(f"Model URI: {model_info.model_uri}")
 
             return model_info
 
@@ -81,7 +92,7 @@ class IrisModelTrainer:
         """Test the loaded model with sample predictions."""
         loaded_model = mlflow.sklearn.load_model(model_info.model_uri)
         predictions = loaded_model.predict(self.X_test)
-        print(f"Sample predictions: {predictions[:10]}")
+        self.logger.info(f"Sample predictions: {predictions[:10]}")
 
     def train(self):
         """Main training pipeline."""
