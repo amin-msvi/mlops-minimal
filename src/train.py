@@ -8,6 +8,7 @@ from config_loader import load_config, get_config_section
 import os
 import logging
 
+
 class IrisModelTrainer:
     def __init__(self):
         self.config = load_config()
@@ -18,7 +19,9 @@ class IrisModelTrainer:
         self.logger = self._setup_logging()
         # Override MLflow URI if environment variable is set
         if "MLFLOW_TRACKING_URI" in os.environ:
-            self.logger.info(f"Overriding MLflow tracking URI: {os.environ['MLFLOW_TRACKING_URI']}")
+            self.logger.info(
+                f"Overriding MLflow tracking URI: {os.environ['MLFLOW_TRACKING_URI']}"
+            )
             self.mlflow_config["tracking_uri"] = os.environ["MLFLOW_TRACKING_URI"]
 
         self.model = None
