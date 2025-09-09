@@ -63,6 +63,6 @@ with mlflow.start_run():
     print(f"Model URI: {model_info.model_uri}")
 
 # Test loaded model
-loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
+loaded_model = mlflow.sklearn.load_model(model_info.model_uri)
 predictions = loaded_model.predict(X_test)
 print(f"Sample predictions: {predictions[:10]}")
